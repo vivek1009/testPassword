@@ -1,0 +1,166 @@
+title: "Workstation Service"
+schemaVersion: 1.0.0
+version: "20200403"
+locale: "en"
+
+groupings:
+  - title: "Predefined General Configuration"
+    visible: false
+    variables:
+    - tenancy_ocid
+    - compartment_ocid
+    - region
+  - title: "Workstation Id"
+    visible: true
+    variables:
+      - workstation_id
+
+  - title: "Jupyterlab Instance Configuration"
+    visible: true
+    variables:
+      - jupyterlab_instance_shape_and_size
+      - jupyterlab_instance_image_ocid
+      - password
+
+  - title: "TTYD config"
+    visible: true
+    variables:
+      - ttyd_username
+
+  - title: "OCI Marketplace Image Details"
+    visible: true
+    variables:
+      - mp_subscription_enabled
+      - mp_listing_id
+      - mp_listing_resource_id
+      - mp_listing_resource_version
+      - marketplace_source_images
+
+  - title: "Network"
+    visible: false
+    variables:
+      - jupyterlab_subnet_CIDR
+      - jupyterlab_vcn_CIDR
+      - security_list_ingress_security_rules_cidr_source_type
+      - security_list_ingress_security_rules_protocol
+      - security_list_ingress_security_rules_source
+      - security_list_ingress_security_rules_tcp_options_jupyterlab_port
+      - security_list_ingress_security_rules_tcp_options_novnc_port
+      - security_list_ingress_security_rules_tcp_options_ssh_port
+      - security_list_ingress_security_rules_tcp_options_ttyd_port
+      - stack_type
+
+variables:
+  workstation_id:
+    title: "Workstation Id"
+    description: "Workstation Id"
+    type: string
+    required: true
+
+  ssh_public_key_file:
+    type: oci:core:ssh:publickey
+    title: "Public SSH key"
+    description: "Public SSH key"
+    required: true
+    visible: false
+
+  jupyterlab_instance_shape_and_size:
+    title: "Jupyterlab instance CPU count and Memory"
+    description: >
+      Jupyterlab instance CPU count in units and memory size in GBs. The compute shape is fixed - E4.flex
+        small
+          -CPU count 1
+          -memory 16GB
+          -doc E4 under https://docs.oracle.com/en-us/iaas/Content/Compute/References/computeshapes.htm#flexible
+        medium
+          -CPU count 20
+          -memory 64GB
+          -doc E4 under https://docs.oracle.com/en-us/iaas/Content/Compute/References/computeshapes.htm#flexible
+        large
+          -CPU count 40
+          -CPU memory 120GB
+          -doc E4 under https://docs.oracle.com/en-us/iaas/Content/Compute/References/computeshapes.htm#flexible
+        gpu
+          -VM.GPU3.1
+          -CPU count 6
+          -CPU memory 90GB
+          -GPU memory 16GB
+          -doc https://docs.oracle.com/en-us/iaas/Content/Compute/References/computeshapes.htm#vmshapes__vm-gpu
+    type: enum
+    enum:
+      - "small"
+      - "medium"
+      - "large"
+      - "gpu"
+    required: true
+    default: "small"
+
+  jupyterlab_instance_image_ocid:
+    title: "jupyterlab instance image ocid"
+    type: oci:core:image:id
+    default: "ocid1.image.oc1.iad.aaaaaaaas2vg4lksfq5gi7j5omjz2u4u54kwceueaud3ckxsllhgvmenwu6q"
+    required: true
+    visible: false
+    dependsOn:
+      compartmentId: ${compartment_ocid}
+
+  password:
+    title: "Password for jupyter notebook, ttyd and vnc"
+    type: password
+    confirmation: true
+    required: true
+    sensitive: true
+
+  mp_subscription_enabled:
+    title: "Image subscription enabled"
+    type: bool
+    required: false
+
+  mp_listing_id:
+    title: "Image listing id"
+    type: string
+    required: false
+
+  mp_listing_resource_id:
+    title: "Image listing resource id"
+    type: string
+    required: false
+
+  mp_listing_resource_version:
+    title: "Image listing resource version"
+    type: string
+    required: false
+
+  bootstrap_file:
+    title: "Jupyter instance init script"
+    type: string
+    required: false
+    default: "./bootstrap.sh"
+    visible: false
+
+  marketplace_source_images:
+    title: "Source image for marketplace publish"
+    multiline: true
+
+  jupyter_port:
+    title: "Jupyter port"
+    type: string
+    visible: false
+    default: "8888/tcp"
+
+  vnc_port:
+    title: "NoVNC port"
+    type: string
+    visible: false
+    default: "5801/tcp"
+
+  ttyd_port:
+    title: "TTYD port"
+    type: string
+    visible: false
+    default: "7681/tcp"
+
+  ttyd_username:
+    title: "TTYD username"
+    type: string
+    visible: true
